@@ -1,0 +1,10 @@
+loader:
+  path: resources/catalog - cheetah.csv
+publisher:
+  connection:
+    host: localhost
+    port: 5672
+    virtual_host: /
+  route:
+    exchange: ""
+    routing_key: q

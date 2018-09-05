@@ -10,3 +10,7 @@
 /*.egg-info
 
 /build/
+
+*__pycache__*
+
+resources/*
