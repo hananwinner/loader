@@ -8,3 +8,20 @@ publisher:
   route:
     exchange: ""
     routing_key: q
+log:
+  version: 1
+  handlers:
+    console:
+      class : logging.StreamHandler
+      level   : INFO
+      stream  : ext://sys.stdout
+    file:
+      class : logging.FileHandler
+      mode: w
+      filename: loader.log
+#      maxBytes: 1024
+#      backupCount: 3
+  loggers:
+    loader:
+      handlers: [console, file]
+
