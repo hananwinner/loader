@@ -3,6 +3,7 @@ import config
 import logging
 import logging.config
 import csv
+import sys
 
 
 def parse_line(line):
@@ -24,7 +25,9 @@ def parse_line(line):
 
 if __name__ == "__main__":
 
-    config.create("config/config.yaml")
+    config_path = sys.argv[1] if len(sys.argv) > 1 else "config/config.yaml"
+
+    config.create(config_path)
 
     logging.config.dictConfig(config.log_dict_config)
     log = logging.getLogger("loader")
