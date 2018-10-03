@@ -1,8 +1,10 @@
 loader:
-  path: resources/catalog - cheetah.csv
+  path: resources/fresh_start.csv
+  interval_min: 1
+  start_immediately: True
 publisher:
   connection:
-    host: localhost
+    host: 172.18.0.2
     port: 5672
     virtual_host: /
   route:

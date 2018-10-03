@@ -1,8 +1,10 @@
 loader:
   path: resources/fresh_start.csv
+  interval_min: 1
+  start_immediately: True
 publisher:
   connection:
-    host: 172.18.0.2
+    host: some-rabbit
     port: 5672
     virtual_host: /
   route:
@@ -13,9 +15,10 @@ log:
   handlers:
     console:
       class : logging.StreamHandler
-      level   : INFO
+      level   : DEBUG
       stream  : ext://sys.stdout
     file:
+      level   : DEBUG
       class : logging.FileHandler
       mode: w
       filename: loader.log
@@ -23,5 +26,6 @@ log:
 #      backupCount: 3
   loggers:
     loader:
+      level   : DEBUG
       handlers: [console, file]
 

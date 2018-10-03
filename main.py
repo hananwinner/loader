@@ -4,6 +4,7 @@ import logging
 import logging.config
 import csv
 import sys
+from utils.repeated_timer import RepeatedTimer
 
 
 def parse_line(line):
@@ -23,8 +24,31 @@ def parse_line(line):
     }
 
 
-if __name__ == "__main__":
+def operation():
+    publisher = create_persistent_async_publisher(config.publisher_config["connection"],
+                                                  config.publisher_config["route"],
+                                                  exchange=config.publisher_config["route"]["exchange"],
+                                                  routing_key=config.publisher_config["route"]["routing_key"]
+                                                  , log=log)
+    publisher.start()
+    l_idx = 0
+    log.info("start reading lines")
+    with open(config.loader_path, "r") as fdr:
+        fdr.readline()
+        for line in fdr:
+            log.info("line {}: {}".format(l_idx, line))
+            l_idx +=1
+            try:
+                doc = parse_line(line)
+                publisher.send(doc)
+            except:
+                log.exception("{} {}".format(l_idx, line))
+    log.info("flushing and stopping publisher")
+    publisher.flush()
+    publisher.stop()
 
+
+if __name__ == "__main__":
     config_path = sys.argv[1] if len(sys.argv) > 1 else "config/config.yaml"
 
     config.create(config_path)
@@ -32,19 +56,9 @@ if __name__ == "__main__":
     logging.config.dictConfig(config.log_dict_config)
     log = logging.getLogger("loader")
 
-    publisher = create_persistent_async_publisher(config.publisher_config["connection"], config.publisher_config["route"],
-                                                  exchange=config.publisher_config["route"]["exchange"],
-                                                  routing_key=config.publisher_config["route"]["routing_key"])
-    publisher.start()
-    l_idx = 0
-    with open(config.loader_path, "r") as fdr:
-        fdr.readline()
-        for line in fdr:
-            l_idx +=1
-            try:
-                doc = parse_line(line)
-                publisher.send(doc)
-            except:
-                log.exception("{} {}".format(l_idx, line))
-    publisher.flush()
-    publisher.stop()
+    timer = RepeatedTimer(operation, config.interval_min * 60, start_immediately=True)
+    timer.start()
+    timer.join()
+
+
+
